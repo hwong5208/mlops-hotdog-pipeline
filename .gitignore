@@ -1,0 +1,25 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Data (too large for git)
+data/
+
+# MLflow local runs
+mlruns/
+mlflow.db
+
+# AWS CDK
+cdk/cdk.out/
+cdk/.venv/
+
+# Environment
+.env
+*.env
+
+# IDE
+.vscode/
+.idea/
