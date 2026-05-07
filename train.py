@@ -1,5 +1,4 @@
-import mlflow
-import mlflow.pytorch
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -7,7 +6,9 @@ from torchvision import datasets, models, transforms
 from torch.utils.data import DataLoader
 from pathlib import Path
 
-DATA_DIR = Path("data")
+# SageMaker injects SM_CHANNEL_TRAINING and SM_MODEL_DIR; fall back to local paths
+DATA_DIR = Path(os.environ.get("SM_CHANNEL_TRAINING", "data"))
+MODEL_DIR = Path(os.environ.get("SM_MODEL_DIR", "model"))
 TRAIN_DIR = DATA_DIR / "train"
 TEST_DIR = DATA_DIR / "test"
 BATCH_SIZE = 32
@@ -29,16 +30,6 @@ test_transforms = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
 ])
-
-train_dataset = datasets.ImageFolder(TRAIN_DIR, transform=train_transforms)
-test_dataset = datasets.ImageFolder(TEST_DIR, transform=test_transforms)
-
-train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, pin_memory=True)
-test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4, pin_memory=True)
-
-print(f"Classes: {train_dataset.classes}")
-print(f"Train: {len(train_dataset)} images | Test: {len(test_dataset)} images")
-
 
 def build_model():
     model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
@@ -81,39 +72,30 @@ def main():
     if device.type == "cuda":
         print(f"GPU: {torch.cuda.get_device_name(0)}")
 
-    mlflow.set_experiment("hotdog-not-hotdog")
+    train_dataset = datasets.ImageFolder(TRAIN_DIR, transform=train_transforms)
+    test_dataset = datasets.ImageFolder(TEST_DIR, transform=test_transforms)
+    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=0)
+    test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
 
-    with mlflow.start_run():
-        mlflow.log_params({
-            "model": "resnet18",
-            "epochs": EPOCHS,
-            "batch_size": BATCH_SIZE,
-            "lr": LR,
-            "device": str(device),
-        })
+    print(f"Classes: {train_dataset.classes}")
+    print(f"Train: {len(train_dataset)} images | Test: {len(test_dataset)} images")
 
-        model = build_model()
-        criterion = nn.CrossEntropyLoss()
-        optimizer = optim.Adam(model.fc.parameters(), lr=LR)
+    model = build_model()
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.fc.parameters(), lr=LR)
 
-        for epoch in range(EPOCHS):
-            train_loss, train_acc = train_epoch(model, train_loader, criterion, optimizer)
-            test_loss, test_acc = evaluate(model, test_loader, criterion)
+    for epoch in range(EPOCHS):
+        train_loss, train_acc = train_epoch(model, train_loader, criterion, optimizer)
+        test_loss, test_acc = evaluate(model, test_loader, criterion)
 
-            mlflow.log_metrics({
-                "train_loss": train_loss,
-                "train_acc": train_acc,
-                "test_loss": test_loss,
-                "test_acc": test_acc,
-            }, step=epoch)
+        print(f"Epoch {epoch+1}/{EPOCHS} | "
+              f"train_loss={train_loss:.4f} train_acc={train_acc:.4f} | "
+              f"test_loss={test_loss:.4f} test_acc={test_acc:.4f}")
 
-            print(f"Epoch {epoch+1}/{EPOCHS} | "
-                  f"Train loss: {train_loss:.4f} acc: {train_acc:.4f} | "
-                  f"Test loss: {test_loss:.4f} acc: {test_acc:.4f}")
-
-        mlflow.pytorch.log_model(model, "model")
-        print(f"\nFinal test accuracy: {test_acc:.4f}")
-        print("Model logged to MLflow.")
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    torch.save(model.state_dict(), MODEL_DIR / "model.pth")
+    print(f"Final test accuracy: {test_acc:.4f}")
+    print("Model saved.")
 
 
 if __name__ == "__main__":

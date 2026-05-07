@@ -1,0 +1,36 @@
+name: Deploy Hotdog Classifier
+
+on:
+  workflow_dispatch:
+    inputs:
+      model_package_arn:
+        description: 'Model Package ARN (leave empty for latest approved)'
+        required: false
+        default: ''
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::855878276402:role/hotdog-github-deploy-dev
+          aws-region: us-west-2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install boto3
+
+      - name: Deploy endpoint
+        run: python deploy_endpoint.py ${{ github.event.inputs.model_package_arn }}
