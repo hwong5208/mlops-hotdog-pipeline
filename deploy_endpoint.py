@@ -65,29 +65,41 @@ def deploy(sm, model_uri, role_arn, suffix):
     model_name = f"{ENDPOINT_NAME}-{suffix}"
     config_name = model_name
 
-    sm.create_model(
-        ModelName=model_name,
-        ExecutionRoleArn=role_arn,
-        PrimaryContainer={
-            "Image": INFERENCE_IMAGE,
-            "ModelDataUrl": model_uri,
-            "Environment": {"SAGEMAKER_SUBMIT_DIRECTORY": "/opt/ml/model/code"},
-        },
-    )
-    print(f"  [ok] Created model: {model_name}")
-
-    sm.create_endpoint_config(
-        EndpointConfigName=config_name,
-        ProductionVariants=[{
-            "VariantName": "primary",
-            "ModelName": model_name,
-            "ServerlessConfig": {
-                "MemorySizeInMB": 2048,
-                "MaxConcurrency": 5,
+    try:
+        sm.create_model(
+            ModelName=model_name,
+            ExecutionRoleArn=role_arn,
+            PrimaryContainer={
+                "Image": INFERENCE_IMAGE,
+                "ModelDataUrl": model_uri,
+                "Environment": {"SAGEMAKER_SUBMIT_DIRECTORY": "/opt/ml/model/code"},
             },
-        }],
-    )
-    print(f"  [ok] Created endpoint config: {config_name}")
+        )
+        print(f"  [ok] Created model: {model_name}")
+    except ClientError as e:
+        if "already exists" in str(e):
+            print(f"  [ok] Model already exists: {model_name}")
+        else:
+            raise
+
+    try:
+        sm.create_endpoint_config(
+            EndpointConfigName=config_name,
+            ProductionVariants=[{
+                "VariantName": "primary",
+                "ModelName": model_name,
+                "ServerlessConfig": {
+                    "MemorySizeInMB": 2048,
+                    "MaxConcurrency": 5,
+                },
+            }],
+        )
+        print(f"  [ok] Created endpoint config: {config_name}")
+    except ClientError as e:
+        if "already exists" in str(e):
+            print(f"  [ok] Endpoint config already exists: {config_name}")
+        else:
+            raise
 
     try:
         sm.create_endpoint(EndpointName=ENDPOINT_NAME, EndpointConfigName=config_name)
