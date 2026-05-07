@@ -81,8 +81,10 @@ def deploy(sm, model_uri, role_arn, suffix):
         ProductionVariants=[{
             "VariantName": "primary",
             "ModelName": model_name,
-            "InstanceType": "ml.t2.medium",
-            "InitialInstanceCount": 1,
+            "ServerlessConfig": {
+                "MemorySizeInMB": 2048,
+                "MaxConcurrency": 5,
+            },
         }],
     )
     print(f"  [ok] Created endpoint config: {config_name}")
