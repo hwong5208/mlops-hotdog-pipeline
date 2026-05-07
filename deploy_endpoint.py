@@ -77,7 +77,7 @@ def deploy(sm, model_uri, role_arn, suffix):
         )
         print(f"  [ok] Created model: {model_name}")
     except ClientError as e:
-        if "already exists" in str(e):
+        if "already exist" in str(e):
             print(f"  [ok] Model already exists: {model_name}")
         else:
             raise
@@ -96,7 +96,7 @@ def deploy(sm, model_uri, role_arn, suffix):
         )
         print(f"  [ok] Created endpoint config: {config_name}")
     except ClientError as e:
-        if "already exists" in str(e):
+        if "already exist" in str(e):
             print(f"  [ok] Endpoint config already exists: {config_name}")
         else:
             raise
