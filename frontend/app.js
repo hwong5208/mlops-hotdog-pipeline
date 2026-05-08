@@ -161,6 +161,7 @@ async function classify(base64, previewSrc) {
 function showResult(data, previewSrc) {
   const isHotdog = data.prediction === "hotdog";
   const pct = Math.round(data.confidence * 100);
+  const otherPct = 100 - pct;
 
   document.getElementById("previewImg").src = previewSrc;
   document.getElementById("predLabel").textContent = isHotdog ? "🌭 Hotdog!" : "❌ Not Hotdog";
@@ -175,8 +176,8 @@ function showResult(data, previewSrc) {
     fill.style.width = `${pct}%`;
   }));
 
-  document.getElementById("p0").textContent = `${Math.round(data.hotdog * 100)}%`;
-  document.getElementById("p1").textContent = `${Math.round(data.not_hotdog * 100)}%`;
+  document.getElementById("p0").textContent = `${isHotdog ? pct : otherPct}%`;
+  document.getElementById("p1").textContent = `${isHotdog ? otherPct : pct}%`;
 
   document.getElementById("result").classList.remove("hidden");
   document.getElementById("result").scrollIntoView({ behavior: "smooth", block: "nearest" });
