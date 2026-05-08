@@ -1,0 +1,10 @@
+{
+  "dev": {
+    "bucket_name": "hotdog-mlops-dev",
+    "ecr_repo_name": "hotdog-train-dev"
+  },
+  "prod": {
+    "bucket_name": "hotdog-mlops-prod",
+    "ecr_repo_name": "hotdog-train-prod"
+  }
+}

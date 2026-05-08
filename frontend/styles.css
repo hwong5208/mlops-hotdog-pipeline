@@ -1,0 +1,10 @@
+.glass-panel {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+/* Dropzone active highlight when file is dragged over */
+#dropzone.border-yellow-500 {
+  background: rgba(234, 179, 8, 0.05);
+}

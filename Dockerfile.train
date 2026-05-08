@@ -1,0 +1,14 @@
+FROM pytorch/pytorch:2.11.0-cuda12.8-cudnn9-runtime
+
+WORKDIR /opt/ml/code
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir --break-system-packages -r requirements.txt
+
+COPY train.py .
+
+ENV PYTHONUNBUFFERED=1
+ENV SM_CHANNEL_TRAINING=/opt/ml/input/data/training
+ENV SM_MODEL_DIR=/opt/ml/model
+
+ENTRYPOINT ["python", "train.py"]

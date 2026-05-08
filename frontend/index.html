@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hotdog Classifier</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="min-h-screen bg-gray-950 text-white">
+
+  <div class="max-w-2xl mx-auto px-4 py-12">
+
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <div class="text-6xl mb-3">🌭</div>
+      <h1 class="text-3xl font-bold tracking-tight">Hotdog Classifier</h1>
+      <p class="text-gray-500 mt-2 text-sm">ResNet18 · Trained on SageMaker · Served on AWS Lambda</p>
+    </div>
+
+    <!-- Upload card -->
+    <div class="glass-panel rounded-2xl p-6 mb-5">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-4">Upload an Image</h2>
+      <div id="dropzone"
+           class="border-2 border-dashed border-gray-700 rounded-xl p-10 text-center cursor-pointer transition-colors hover:border-yellow-500">
+        <input type="file" id="fileInput" accept="image/*" class="hidden" />
+        <p class="text-gray-300 font-medium">Drag &amp; drop or <span class="text-yellow-400">click to browse</span></p>
+        <p class="text-gray-600 text-xs mt-2">JPG · PNG · WebP — resized to 512 px client-side before sending</p>
+      </div>
+    </div>
+
+    <!-- Sample images card (only rendered if samples exist) -->
+    <div id="samplesCard" class="glass-panel rounded-2xl p-6 mb-5 hidden">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-4">Try a Sample</h2>
+
+      <p class="text-xs text-gray-500 mb-2 uppercase tracking-wider">🌭 Hotdog</p>
+      <div id="samplesHotdog" class="grid grid-cols-4 gap-3 mb-5"></div>
+
+      <p class="text-xs text-gray-500 mb-2 uppercase tracking-wider">❌ Not Hotdog</p>
+      <div id="samplesNotHotdog" class="grid grid-cols-4 gap-3"></div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="hidden text-center py-8">
+      <svg class="animate-spin h-8 w-8 mx-auto text-yellow-400 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+      </svg>
+      <p class="text-gray-400 text-sm">Classifying…</p>
+    </div>
+
+    <!-- Error -->
+    <div id="error" class="hidden bg-red-950 border border-red-800 rounded-2xl p-4 mb-5">
+      <p class="text-red-400 text-sm" id="errorMsg"></p>
+    </div>
+
+    <!-- Result card -->
+    <div id="result" class="glass-panel rounded-2xl p-6 hidden">
+      <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-4">Result</h2>
+      <div class="flex gap-5 items-center">
+
+        <!-- Preview thumbnail -->
+        <img id="previewImg" class="w-28 h-28 object-cover rounded-xl flex-shrink-0" src="" alt="preview" />
+
+        <!-- Prediction -->
+        <div class="flex-1 min-w-0">
+          <div id="predLabel" class="text-2xl font-bold mb-3"></div>
+
+          <!-- Confidence bar -->
+          <div class="mb-3">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>Confidence</span>
+              <span id="confPct"></span>
+            </div>
+            <div class="w-full bg-gray-800 rounded-full h-2">
+              <div id="confFill" class="h-2 rounded-full transition-all duration-700 w-0"></div>
+            </div>
+          </div>
+
+          <!-- Per-class breakdown -->
+          <div class="grid grid-cols-2 gap-2 text-xs text-gray-400">
+            <div class="bg-gray-800 rounded-lg p-2">
+              <span class="text-gray-500">🌭 hotdog</span>
+              <span id="p0" class="float-right text-white font-medium"></span>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-2">
+              <span class="text-gray-500">❌ not hotdog</span>
+              <span id="p1" class="float-right text-white font-medium"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <p class="text-center text-gray-800 text-xs mt-10">PyTorch · AWS Lambda · CloudFront · CDK</p>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

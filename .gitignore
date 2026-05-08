@@ -8,13 +8,19 @@ __pycache__/
 # Data (too large for git)
 data/
 
+# Model artifacts (binary files)
+model.pth
+model.tar.gz
+
 # MLflow local runs
 mlruns/
 mlflow.db
 
-# AWS CDK
-cdk/cdk.out/
-cdk/.venv/
+# AWS CDK synthesized output
+cdk.out/
+
+# CLI test output
+response.json
 
 # Environment
 .env

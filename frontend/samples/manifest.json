@@ -1,0 +1,4 @@
+{
+  "hotdog": ["hotdog1.jpg", "hotdog2.jpg", "hotdog3.jpg", "hotdog4.jpg"],
+  "not_hotdog": ["nothotdog1.jpg", "nothotdog2.jpg", "nothotdog3.jpg", "nothotdog4.jpg"]
+}
