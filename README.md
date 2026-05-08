@@ -49,6 +49,26 @@ flowchart TD
 
 ---
 
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Model** | PyTorch 2.1 · ResNet-18 (fine-tuned, transfer learning) · torchvision |
+| **Training** | Amazon SageMaker Training Jobs · Managed Spot Instances (ml.g4dn.xlarge) |
+| **Experiment Tracking** | SageMaker Experiments (metrics, trials, runs) |
+| **Model Versioning** | SageMaker Model Registry (approval workflow) |
+| **Container Registry** | Amazon ECR (custom PyTorch training image) |
+| **Artifact Storage** | Amazon S3 (training data, model weights, repackaged inference bundle) |
+| **Inference** | SageMaker Serverless Inference · PyTorch DLC (`pytorch-inference:2.1.0`) |
+| **API** | AWS Lambda (proxy) · Amazon API Gateway HTTP API |
+| **Frontend** | Vanilla JS / HTML / CSS · Amazon S3 · Amazon CloudFront (OAC) |
+| **Infrastructure** | AWS CDK v2 (Python) · CloudFormation |
+| **CI/CD** | GitHub Actions · AWS OIDC (keyless, no stored secrets) |
+| **Config** | AWS SSM Parameter Store |
+| **Language** | Python 3.11 |
+
+---
+
 ## Pipeline Steps
 
 ### 1 · Train
