@@ -2,6 +2,8 @@
 
 **Live Demo (CloudFront URL)**: [https://d1un7sp3ldhfof.cloudfront.net](https://d1un7sp3ldhfof.cloudfront.net)
 
+![Live Demo](docs/cloudfront_demo.png)
+
 A fully serverless MLOps pipeline on AWS that trains, versions, approves, and deploys a hotdog/not-hotdog image classifier — end to end. The model is a fine-tuned ResNet-18 achieving **~89% test accuracy**, served via a SageMaker Serverless Endpoint behind API Gateway and CloudFront.
 
 Infrastructure is defined entirely with **AWS CDK (Python)**. Deployment is keyless via **GitHub Actions OIDC** — no stored AWS credentials.
